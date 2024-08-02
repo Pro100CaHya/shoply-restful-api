@@ -1,5 +1,8 @@
+import { availableParallelism } from "node:os";
+
 import { PostgresService } from "./postgres";
 import { Server } from "./server";
+import { Cluster } from "./cluster";
 import { config } from "dotenv";
 import { UserController, UserRepository, UserService } from "./user";
 
@@ -11,8 +14,8 @@ const {
     POSTGRES_PASSWORD,
     POSTGRES_PORT,
     POSTGRES_HOST,
-    PORT
-} = process.env
+    SERVER_PORT
+} = process.env;
 
 const postgresService = new PostgresService(
     POSTGRES_USER,
@@ -27,8 +30,15 @@ const userService = new UserService(userRepository);
 const userController = new UserController(userService);
 
 const server = new Server(
-    parseInt(PORT),
+    parseInt(SERVER_PORT),
     [
         userController
     ]
 );
+
+const cluster = new Cluster(
+    server,
+    availableParallelism()
+);
+
+cluster.initializeClusters();
