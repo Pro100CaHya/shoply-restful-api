@@ -11,6 +11,7 @@ class CategoryController {
     }
 
     private initializeRoutes() {
+        this.router.get(`${this.path}/:id`, this.getCategory);
         this.router.post(`${this.path}`, this.createCategory);
     }
 
@@ -27,6 +28,29 @@ class CategoryController {
                     },
                     data: {
                         ...createdCategory
+                    }
+                });
+        } catch (error) {
+            console.log(error);
+
+            response.status(500)
+                .json(error);
+        }
+    }
+
+    private getCategory = async (request: Request, response: Response, next: NextFunction) => {
+        try {
+            const { id } = request.params;
+
+            const category = await this.categoryService.getCategory(parseInt(id));
+
+            response.status(200)
+                .json({
+                    meta: {
+                        status: "success"
+                    },
+                    data: {
+                        ...category
                     }
                 });
         } catch (error) {

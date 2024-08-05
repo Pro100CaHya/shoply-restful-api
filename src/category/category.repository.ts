@@ -24,6 +24,53 @@ class CategoryRepository {
 
         return CategoryMapper.toDomain(queryResult.rows[0]);
     }
+
+    public async getCategory(id: number): Promise<Category> {
+        const queryResult = await this.postgresService.query(
+            `
+                SELECT id, name
+                FROM categories
+                WHERE id = $1;
+            `,
+            [
+                id
+            ]
+        );
+
+        return CategoryMapper.toDomain(queryResult.rows[0]);
+    }
+
+    public async deleteCategory(id: number): Promise<Category> {
+        const queryResult = await this.postgresService.query(
+            `
+                DELETE FROM categories
+                WHERE id = $1
+                RETURNING id, name;
+            `,
+            [
+                id
+            ]
+        );
+
+        return CategoryMapper.toDomain(queryResult.rows[0]);
+    }
+
+    public async getAllCategories(page: number = 1, size: number = 10): Promise<Category[]> {
+        const queryResult = await this.postgresService.query(
+            `
+                SELECT id, name
+                FROM categories
+                LIMIT $1
+                OFFSET $2;
+            `,
+            [
+                size,
+                (page - 1) * size
+            ]
+        );
+
+        return queryResult.rows.map((row) => CategoryMapper.toDomain(row));
+    }
 }
 
 export {

@@ -8,6 +8,10 @@ class CategoryService {
     public async createCategory(createCategoryDto: CreateCategoryDto): Promise<Category> {
         return await this.categoryRepository.createCategory(createCategoryDto);
     }
+
+    public async getCategory(id: number): Promise<Category> {
+        return await this.categoryRepository.getCategory(id);
+    }
 }
 
 export {
