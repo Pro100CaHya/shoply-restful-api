@@ -13,8 +13,8 @@ class PostgresService {
         });
     }
 
-    public async connect(): Promise<PoolClient> {
-        return await this.pool.connect();
+    public async connect() {
+        await this.pool.connect();
     }
 
     public async close() {

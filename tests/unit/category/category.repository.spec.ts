@@ -55,6 +55,16 @@ describe("Test Category Repository", () => {
 
         const createCategoryResult = await categoryRepository.createCategory(createCategoryDto);
 
+        expect(postgresService.query).toHaveBeenCalledWith(
+            `
+                INSERT INTO categories (name, updated_at)
+                VALUES ($1, CURRENT_TIMESTAMP)
+                RETURNING id, name;
+            `,
+            [
+                createCategoryDto.name
+            ]
+        )
         expect(postgresService.query).toHaveBeenCalledTimes(1);
         expect(createCategoryResult).toEqual(mockedCreateCategoryResult);
     });
