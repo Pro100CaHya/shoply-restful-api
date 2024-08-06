@@ -1,5 +1,5 @@
 import { PostgresService } from "src/postgres";
-import { CreateCategoryDto } from "./dto";
+import { CreateCategoryDto, UpdateCategoryDto } from "./dto";
 import { CategoryMapper } from "./category.mapper";
 import { Category } from "./category.interface";
 
@@ -25,7 +25,7 @@ class CategoryRepository {
         return CategoryMapper.toDomain(queryResult.rows[0]);
     }
 
-    public async getCategory(id: number): Promise<Category> {
+    public async getCategory(id: number): Promise<Category | null> {
         const queryResult = await this.postgresService.query(
             `
                 SELECT id, name
@@ -36,6 +36,10 @@ class CategoryRepository {
                 id
             ]
         );
+
+        if (queryResult.rows.length === 0) {
+            return null;
+        }
 
         return CategoryMapper.toDomain(queryResult.rows[0]);
     }
@@ -70,6 +74,23 @@ class CategoryRepository {
         );
 
         return queryResult.rows.map((row) => CategoryMapper.toDomain(row));
+    }
+
+    public async updateCategory(updateCategoryDto: UpdateCategoryDto, id: number): Promise<Category> {
+        const queryResult = await this.postgresService.query(
+            `
+                UPDATE categories
+                SET name = $1
+                WHERE id = $2
+                RETURNING id, name;
+            `,
+            [
+                updateCategoryDto.name,
+                id
+            ]
+        );
+
+        return CategoryMapper.toDomain(queryResult.rows[0]);
     }
 }
 

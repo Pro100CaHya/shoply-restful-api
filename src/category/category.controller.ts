@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { CategoryService } from "./category.service";
-import { CreateCategoryDto } from "./dto";
+import { CreateCategoryDto, UpdateCategoryDto } from "./dto";
 import { HttpBodyResponse, HttpBodyResponseMetaStatus } from "src/interfaces";
 
 class CategoryController {
@@ -13,7 +13,10 @@ class CategoryController {
 
     private initializeRoutes() {
         this.router.get(`${this.path}/:id`, this.getCategory);
+        this.router.get(`${this.path}`, this.getAllCategories);
         this.router.post(`${this.path}`, this.createCategory);
+        this.router.patch(`${this.path}/:id`, this.updateCategory);
+        this.router.delete(`${this.path}/:id`, this.deleteCategory);
     }
 
     private createCategory = async (request: Request, response: Response, next: NextFunction) => {
@@ -23,19 +26,22 @@ class CategoryController {
             const createdCategory = await this.categoryService.createCategory(createCategoryDto);
 
             const httpBodyResponse: HttpBodyResponse = {
-                meta: {
-                    message: null,
-                    status: HttpBodyResponseMetaStatus.SUCCESS,
-                },
-                data: null,
+                data: [
+                    createdCategory
+                ],
                 details: {
                     statusCode: 201,
                     method: request.method,
                     time: new Date().toISOString()
-                }
+                },
+                meta: {
+                    message: "Category created",
+                    status: HttpBodyResponseMetaStatus.SUCCESS,
+                },
             }
 
-            response.status(201)
+            response
+                .status(201)
                 .json(httpBodyResponse);
         } catch (error) {
             next(error);
@@ -48,14 +54,103 @@ class CategoryController {
 
             const category = await this.categoryService.getCategory(parseInt(id));
 
-            response.status(200)
+            response
+                .status(200)
                 .json({
-                    meta: {
-                        status: "success"
+                    data: [
+                        category
+                    ],
+                    details: {
+                        statusCode: 200,
+                        method: request.method,
+                        time: new Date().toISOString()
                     },
-                    data: {
-                        ...category
-                    }
+                    meta: {
+                        message: "Get the category",
+                        status: HttpBodyResponseMetaStatus.SUCCESS,
+                    },
+                });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    private getAllCategories = async (request: Request, response: Response, next: NextFunction) => {
+        try {
+            const categories = await this.categoryService.getAllCategories();
+
+            response
+                .status(200)
+                .json({
+                    data: [
+                        ...categories
+                    ],
+                    details: {
+                        statusCode: 200,
+                        method: request.method,
+                        time: new Date().toISOString()
+                    },
+                    meta: {
+                        message: "Received categories",
+                        status: HttpBodyResponseMetaStatus.SUCCESS,
+                    },
+                });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    private updateCategory = async (request: Request, response: Response, next: NextFunction) => {
+        try {
+            const { id } = request.params;
+            const updateCategoryDto: UpdateCategoryDto = {
+                name: request.body.name
+            }
+
+            const category = await this.categoryService.updateCategory(updateCategoryDto, parseInt(id));
+
+            response
+                .status(200)
+                .json({
+                    data: [
+                        category
+                    ],
+                    details: {
+                        statusCode: 200,
+                        method: request.method,
+                        time: new Date().toISOString()
+                    },
+                    meta: {
+                        message: "Category updated",
+                        status: HttpBodyResponseMetaStatus.SUCCESS,
+                    },
+                });
+        } catch (error) {
+            next(error);
+        }
+    }
+
+    private deleteCategory = async (request: Request, response: Response, next: NextFunction) => {
+        try {
+            const { id } = request.params;
+
+            const category = await this.categoryService.deleteCategory(parseInt(id));
+
+            response
+                .status(200)
+                .json({
+                    data: [
+                        category
+                    ],
+                    details: {
+                        statusCode: 200,
+                        method: request.method,
+                        time: new Date().toISOString()
+                    },
+                    meta: {
+                        message: "Category deleted",
+                        status: HttpBodyResponseMetaStatus.SUCCESS,
+                    },
                 });
         } catch (error) {
             next(error);

@@ -5,10 +5,10 @@
   "scripts": {
     "start": "node dist/index.js",
     "dev": "npx tsx --watch src/index.ts",
-    "build": "npx tsc && tsc-alias",
+    "build": "npx tsc -p tsconfig.build.json && tsc-alias",
     "prisma:dev": "npx prisma migrate dev",
     "jest:unit": "npx jest --testPathPattern=tests/unit",
-    "jest:integration": "npx jest --runInBand --testPathPattern=tests/integration"
+    "jest:integration": "npx jest --runInBand --forceExit --testPathPattern=tests/integration"
   },
   "keywords": [],
   "author": "",

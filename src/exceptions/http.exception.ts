@@ -1,5 +1,5 @@
-import { HttpResponse } from "src/interfaces";
-import { HttpResponseMetaStatus } from "src/interfaces/http-response";
+import { HttpBodyResponse } from "src/interfaces";
+import { HttpBodyResponseMetaStatus } from "src/interfaces/http-response";
 
 class HttpException extends Error {
     public message: string;

@@ -1,6 +1,7 @@
 import { Category } from "./category.interface";
 import { CategoryRepository } from "./category.repository";
-import { CreateCategoryDto } from "./dto";
+import { CreateCategoryDto, UpdateCategoryDto } from "./dto";
+import { CategoryNotFoundException } from "./exceptions";
 
 class CategoryService {
     constructor(private categoryRepository: CategoryRepository) { }
@@ -10,7 +11,37 @@ class CategoryService {
     }
 
     public async getCategory(id: number): Promise<Category> {
+        const category = await this.categoryRepository.getCategory(id);
+
+        if (!category) {
+            throw new CategoryNotFoundException(id);
+        }
+        
         return await this.categoryRepository.getCategory(id);
+    }
+
+    public async getAllCategories(): Promise<Category[]> {        
+        return await this.categoryRepository.getAllCategories();
+    }
+
+    public async updateCategory(updateCategoryDto: UpdateCategoryDto, id: number): Promise<Category> {
+        const category = await this.categoryRepository.getCategory(id);
+
+        if (!category) {
+            throw new CategoryNotFoundException(id);
+        }
+
+        return await this.categoryRepository.updateCategory(updateCategoryDto, id);
+    }
+
+    public async deleteCategory(id: number): Promise<Category> {
+        const category = await this.categoryRepository.getCategory(id);
+
+        if (!category) {
+            throw new CategoryNotFoundException(id);
+        }
+
+        return await this.categoryRepository.deleteCategory(id);
     }
 }
 

@@ -37,10 +37,6 @@ class Server {
     public startServer() {
         this.app.listen(this.port, () => console.log(`Server started on port ${this.port}, process PID ${process.pid}`));
     }
-
-    public stopServer() {
-        process.exit(1);
-    }
 }
 
 export {

@@ -98,4 +98,130 @@ describe("Integration Test Category Repository", () => {
         });
         expect(parseInt(countOfCategories.rows[0].count)).toEqual(2);
     });
+
+    it("Should create the category 'Laptops' in database", async () => {
+        const createCategoryDto: CreateCategoryDto = {
+            name: "Laptops"
+        }
+
+        const createCategoryResult = await categoryRepository.createCategory(createCategoryDto);
+        const countOfCategories = await postgresService.query(
+            `
+                SELECT COUNT(id)
+                FROM categories
+            `
+        );
+        const selectCreatedCategory = await postgresService.query(
+            `
+                SELECT id, name
+                FROM categories
+                WHERE id = $1;
+            `,
+            [
+                3
+            ]
+        );
+
+        expect(selectCreatedCategory?.rows[0]).toEqual({
+            id: 3,
+            name: "Laptops"
+        });
+        expect(createCategoryResult).toEqual({
+            id: 3,
+            name: "Laptops"
+        });
+        expect(parseInt(countOfCategories.rows[0].count)).toEqual(3);
+    });
+
+    it("Should create the category 'Tables' in database", async () => {
+        const createCategoryDto: CreateCategoryDto = {
+            name: "Tables"
+        }
+
+        const createCategoryResult = await categoryRepository.createCategory(createCategoryDto);
+        const countOfCategories = await postgresService.query(
+            `
+                SELECT COUNT(id)
+                FROM categories
+            `
+        );
+        const selectCreatedCategory = await postgresService.query(
+            `
+                SELECT id, name
+                FROM categories
+                WHERE id = $1;
+            `,
+            [
+                4
+            ]
+        );
+
+        expect(selectCreatedCategory?.rows[0]).toEqual({
+            id: 4,
+            name: "Tables"
+        });
+        expect(createCategoryResult).toEqual({
+            id: 4,
+            name: "Tables"
+        });
+        expect(parseInt(countOfCategories.rows[0].count)).toEqual(4);
+    });
+
+    it("Should get all the categories", async () => {
+        const getAllCategories = await categoryRepository.getAllCategories();
+
+        expect(getAllCategories).toEqual([
+            {
+                id: 1,
+                name: "Mobile phones"
+            },
+            {
+                id: 2,
+                name: "Tablets"
+            },
+            {
+                id: 3,
+                name: "Laptops"
+            },
+            {
+                id: 4,
+                name: "Tables"
+            }
+        ]);
+    });
+
+    it("Should get second two categories", async () => {
+        const getAllCategories = await categoryRepository.getAllCategories(2, 2);
+
+        expect(getAllCategories).toEqual([
+            {
+                id: 3,
+                name: "Laptops"
+            },
+            {
+                id: 4,
+                name: "Tables"
+            }
+        ]);
+    });
+
+    it("Should delete category 'Laptops'", async () => {
+        const deleteCategoryResult = await categoryRepository.deleteCategory(3);
+
+        expect(deleteCategoryResult).toEqual(
+            {
+                id: 3,
+                name: "Laptops"
+            }
+        );
+
+        const checkCountOfCategories = await postgresService.query(
+            `
+                SELECT COUNT(id)
+                FROM categories
+            `
+        );
+
+        expect(parseInt(checkCountOfCategories.rows[0].count)).toEqual(3);
+    });
 });

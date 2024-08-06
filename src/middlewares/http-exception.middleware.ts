@@ -16,7 +16,7 @@ function httpExceptionMiddleware(error: HttpException, request: Request, respons
         },
         meta: {
             message,
-            status: HttpBodyResponseMetaStatus.SUCCESS,
+            status: HttpBodyResponseMetaStatus.FAILED,
         }
     }
 
