@@ -1,6 +1,7 @@
 import bodyParser from "body-parser";
 import express, { Application } from "express";
 import { Controller } from "src/interfaces";
+import { httpExceptionMiddleware } from "src/middlewares";
 
 class Server {
     private app: Application
@@ -12,6 +13,7 @@ class Server {
 
         this.initializeMiddlewares();
         this.initializeControllers(controllers);
+        this.initializeErrorHandling();
     }
 
     private initializeMiddlewares() {
@@ -28,8 +30,16 @@ class Server {
         });
     }
 
+    private initializeErrorHandling() {
+        this.app.use(httpExceptionMiddleware);
+    }
+
     public startServer() {
         this.app.listen(this.port, () => console.log(`Server started on port ${this.port}, process PID ${process.pid}`));
+    }
+
+    public stopServer() {
+        process.exit(1);
     }
 }
 

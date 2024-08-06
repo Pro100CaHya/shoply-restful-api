@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response, Router } from "express";
 import { CategoryService } from "./category.service";
 import { CreateCategoryDto } from "./dto";
+import { HttpBodyResponse, HttpBodyResponseMetaStatus } from "src/interfaces";
 
 class CategoryController {
     public router = Router();
@@ -21,20 +22,23 @@ class CategoryController {
 
             const createdCategory = await this.categoryService.createCategory(createCategoryDto);
 
-            response.status(200)
-                .json({
-                    meta: {
-                        status: "success"
-                    },
-                    data: {
-                        ...createdCategory
-                    }
-                });
-        } catch (error) {
-            console.log(error);
+            const httpBodyResponse: HttpBodyResponse = {
+                meta: {
+                    message: null,
+                    status: HttpBodyResponseMetaStatus.SUCCESS,
+                },
+                data: null,
+                details: {
+                    statusCode: 201,
+                    method: request.method,
+                    time: new Date().toISOString()
+                }
+            }
 
-            response.status(500)
-                .json(error);
+            response.status(201)
+                .json(httpBodyResponse);
+        } catch (error) {
+            next(error);
         }
     }
 
@@ -54,10 +58,7 @@ class CategoryController {
                     }
                 });
         } catch (error) {
-            console.log(error);
-
-            response.status(500)
-                .json(error);
+            next(error);
         }
     }
 }

@@ -11,7 +11,12 @@ describe("Test Category Repository", () => {
     beforeEach(() => {
         postgresService = new PostgresService('user', 'host', 'database', 'password', 5432) as jest.Mocked<PostgresService>;
         categoryRepository = new CategoryRepository(postgresService);
+        jest.spyOn(CategoryMapper, "toDomain");
     });
+
+    afterEach(() => {
+        jest.clearAllMocks();
+    })
 
     it("Should create category 'Mobile Phones'", async () => {
         const mockedQueryResult: QueryResult = {
@@ -55,6 +60,8 @@ describe("Test Category Repository", () => {
 
         const createCategoryResult = await categoryRepository.createCategory(createCategoryDto);
 
+        expect(CategoryMapper.toDomain).toHaveBeenCalledTimes(1);
+
         expect(postgresService.query).toHaveBeenCalledWith(
             `
                 INSERT INTO categories (name, updated_at)
@@ -64,7 +71,7 @@ describe("Test Category Repository", () => {
             [
                 createCategoryDto.name
             ]
-        )
+        );
         expect(postgresService.query).toHaveBeenCalledTimes(1);
         expect(createCategoryResult).toEqual(mockedCreateCategoryResult);
     });
@@ -117,6 +124,7 @@ describe("Test Category Repository", () => {
 
         const createCategoryResult = await categoryRepository.getCategory(categoryId);
 
+        expect(CategoryMapper.toDomain).toHaveBeenCalledTimes(1);
         expect(postgresService.query).toHaveBeenCalledTimes(1);
         expect(postgresService.query).toHaveBeenCalledWith(
             `
@@ -169,6 +177,7 @@ describe("Test Category Repository", () => {
 
         const createCategoryResult = await categoryRepository.deleteCategory(categoryId);
 
+        expect(CategoryMapper.toDomain).toHaveBeenCalledTimes(1);
         expect(postgresService.query).toHaveBeenCalledTimes(1);
         expect(postgresService.query).toHaveBeenCalledWith(
             `
@@ -240,6 +249,7 @@ describe("Test Category Repository", () => {
 
         const createCategoryResult = await categoryRepository.getAllCategories(page, size);
 
+        expect(CategoryMapper.toDomain).toHaveBeenCalledTimes(3);
         expect(postgresService.query).toHaveBeenCalledTimes(1);
         expect(postgresService.query).toHaveBeenCalledWith(
             `

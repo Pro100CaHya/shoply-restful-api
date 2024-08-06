@@ -43,11 +43,26 @@ describe("Integration Test Category Repository", () => {
             `
         );
 
+        const selectCreatedCategory = await postgresService.query(
+            `
+                SELECT id, name
+                FROM categories
+                WHERE id = $1;
+            `,
+            [
+                1
+            ]
+        );
+
         expect(createCategoryResult).toEqual({
             id: 1,
             name: "Mobile phones"
         });
-        expect(parseInt(countOfCategories.rows[0].count)).toEqual(1);
+        expect(selectCreatedCategory?.rows[0]).toEqual({
+            id: 1,
+            name: "Mobile phones"
+        });
+        expect(parseInt(countOfCategories?.rows[0].count)).toEqual(1);
     });
 
     it("Should create the category 'Tablets' in database", async () => {
@@ -62,7 +77,21 @@ describe("Integration Test Category Repository", () => {
                 FROM categories
             `
         );
+        const selectCreatedCategory = await postgresService.query(
+            `
+                SELECT id, name
+                FROM categories
+                WHERE id = $1;
+            `,
+            [
+                2
+            ]
+        );
 
+        expect(selectCreatedCategory?.rows[0]).toEqual({
+            id: 2,
+            name: "Tablets"
+        });
         expect(createCategoryResult).toEqual({
             id: 2,
             name: "Tablets"

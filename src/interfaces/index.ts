@@ -1,5 +1,8 @@
 import { Controller } from "./controller";
+import { HttpBodyResponse, HttpBodyResponseMetaStatus } from "./http-response";
 
 export {
-    Controller
+    Controller,
+    HttpBodyResponse,
+    HttpBodyResponseMetaStatus
 }
