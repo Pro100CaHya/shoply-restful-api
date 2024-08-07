@@ -1,5 +1,7 @@
-import { CreateCategoryDto } from "src/category";
+import { CreateGoodDto } from "./create-good.dto"
+import { UpdateGoodDto } from "./update-good.dto"
 
 export {
-    CreateCategoryDto
+    CreateGoodDto,
+    UpdateGoodDto
 }

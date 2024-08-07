@@ -1,6 +1,7 @@
 import { CategoryService, CategoryNotFoundException } from "src/category";
-import { CreateGoodDto } from "./dto/create-good.dto";
+import { CreateGoodDto } from "./dto";
 import { GoodRepository } from "./good.repository";
+import { GoodNotFoundException } from "./exceptions";
 
 class GoodService {
     constructor(
@@ -14,6 +15,20 @@ class GoodService {
         const createdGood = await this.goodRepository.createGood(createGoodDto);
 
         return createdGood;
+    }
+
+    public async getGoodById(id: number) {
+        const good = await this.goodRepository.getGoodById(id);
+
+        if (!good) {
+            throw new GoodNotFoundException(id);
+        }
+
+        return good;
+    }
+
+    public async getAllGoods(page: number, size: number) {
+        return await this.goodRepository.getAllGoods(page, size);
     }
 }
 

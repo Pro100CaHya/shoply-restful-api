@@ -20,8 +20,8 @@ class CategoryService {
         return await this.categoryRepository.getCategory(id);
     }
 
-    public async getAllCategories(): Promise<Category[]> {        
-        return await this.categoryRepository.getAllCategories();
+    public async getAllCategories(page: number, size: number): Promise<Category[]> {        
+        return await this.categoryRepository.getAllCategories(page, size);
     }
 
     public async updateCategory(updateCategoryDto: UpdateCategoryDto, id: number): Promise<Category> {

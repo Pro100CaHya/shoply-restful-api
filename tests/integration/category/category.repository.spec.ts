@@ -224,4 +224,31 @@ describe("Integration Test Category Repository", () => {
 
         expect(parseInt(checkCountOfCategories.rows[0].count)).toEqual(3);
     });
+
+    it("Should update category 'Laptops'", async () => {
+        const updateCategoryResult = await categoryRepository.updateCategory({ name: "Watches" }, 4);
+
+        expect(updateCategoryResult).toEqual(
+            {
+                id: 4,
+                name: "Watches"
+            }
+        );
+
+        const checkUpdatedCategory = await postgresService.query(
+            `
+                SELECT id, name
+                FROM categories
+                WHERE id = $1;
+            `,
+            [
+                4
+            ]
+        );
+
+        expect(checkUpdatedCategory.rows[0]).toEqual({
+            id: 4,
+            name: "Watches"
+        });
+    });
 });

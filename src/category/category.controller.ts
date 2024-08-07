@@ -77,7 +77,12 @@ class CategoryController {
 
     private getAllCategories = async (request: Request, response: Response, next: NextFunction) => {
         try {
-            const categories = await this.categoryService.getAllCategories();
+            const {
+                page,
+                size
+            } = request.query;
+
+            const categories = await this.categoryService.getAllCategories(Number(page), Number(size));
 
             response
                 .status(200)

@@ -84,4 +84,83 @@ describe("Integration Test Good Repository", () => {
             }
         });
     });
+
+    it("should create a good 'iPhone 14 Pro Max', category 'Smartphones'", async () => {
+        const createGoodDto: CreateGoodDto = {
+            name: "iPhone 14 Pro Max",
+            price: 1049,
+            categoryId: 1
+        }
+
+        const createGoodResult = await goodRepository.createGood(createGoodDto);
+
+        expect(createGoodResult).toEqual({
+            id: 3,
+            name: "iPhone 14 Pro Max",
+            price: 1049,
+            category: {
+                id: 1,
+                name: "Smartphones"
+            }
+        });
+    });
+
+    it("should create a good 'Xiaomi Redmibook Pro 16', category 'Laptops'", async () => {
+        const createGoodDto: CreateGoodDto = {
+            name: "Xiaomi Redmibook Pro 16",
+            price: 1499,
+            categoryId: 2
+        }
+
+        const createGoodResult = await goodRepository.createGood(createGoodDto);
+
+        expect(createGoodResult).toEqual({
+            id: 4,
+            name: "Xiaomi Redmibook Pro 16",
+            price: 1499,
+            category: {
+                id: 2,
+                name: "Laptops"
+            }
+        });
+    });
+
+    it("should get a good 'Xiaomi Mi Notebook Pro 14', category 'Laptops'", async () => {
+        const getGoodResult = await goodRepository.getGoodById(2);
+
+        expect(getGoodResult).toEqual({
+            id: 2,
+            name: "Xiaomi Mi Notebook Pro 14",
+            price: 1299,
+            category: {
+                id: 2,
+                name: "Laptops"
+            }
+        });
+    });
+
+    it("should get second two goods", async () => {
+        const getGoodsResult = await goodRepository.getAllGoods(2, 2);
+
+        expect(getGoodsResult).toEqual([
+            {
+                id: 3,
+                name: "iPhone 14 Pro Max",
+                price: 1049,
+                category: {
+                    id: 1,
+                    name: "Smartphones"
+                }
+            },
+            {
+                id: 4,
+                name: "Xiaomi Redmibook Pro 16",
+                price: 1499,
+                category: {
+                    id: 2,
+                    name: "Laptops"
+                }
+            }
+        ]);
+    });
 })

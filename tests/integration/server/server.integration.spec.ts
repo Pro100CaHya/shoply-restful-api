@@ -59,7 +59,7 @@ describe("Integration Server Test", () => {
         await postgresService.query(`ALTER SEQUENCE categories_id_seq RESTART WITH 1`);
     });
 
-    it("should create a category", async () => {
+    it("should create a category 'Mobile phones'", async () => {
         const response = await request("http://localhost:3000")
             .post("/api/categories")
             .send({
@@ -67,6 +67,59 @@ describe("Integration Server Test", () => {
             });
 
         expect(response.status).toBe(201);
+    });
+
+    it("should create a category 'Mobile phones'", async () => {
+        const response = await request("http://localhost:3000")
+            .post("/api/categories")
+            .send({
+                name: "Smartwatches"
+            });
+
+        expect(response.status).toBe(201);
+    });
+
+    it("should create a category 'Tablets'", async () => {
+        const response = await request("http://localhost:3000")
+            .post("/api/categories")
+            .send({
+                name: "Tablets"
+            });
+
+        expect(response.status).toBe(201);
+    });
+
+    it("should create a category 'Laptops'", async () => {
+        const response = await request("http://localhost:3000")
+            .post("/api/categories")
+            .send({
+                name: "Laptops"
+            });
+
+        expect(response.status).toBe(201);
+        expect(response.body.data).toEqual([
+            {
+                id: 4,
+                name: "Laptops"
+            }
+        ])
+    });
+
+    it("should get second two categories", async () => {
+        const response = await request("http://localhost:3000")
+            .get("/api/categories?page=2&size=2")
+            .send();
+
+        expect(response.body.data).toEqual([
+            {
+                id: 3,
+                name: "Tablets"
+            },
+            {
+                id: 4,
+                name: "Laptops"
+            }
+        ]);
     });
 
     it("should get a category", async () => {
@@ -84,7 +137,7 @@ describe("Integration Server Test", () => {
 
     it("should not found category", async () => {
         const response = await request("http://localhost:3000")
-            .get("/api/categories/2")
+            .get("/api/categories/5")
             .send();
 
         expect(response.status).toBe(404);
