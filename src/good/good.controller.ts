@@ -85,9 +85,7 @@ export class GoodController {
             const goods = await this.goodService.getAllGoods(Number(page), Number(size));
 
             const httpBodyResponse: HttpBodyResponse = {
-                data: [
-                    goods
-                ],
+                data: goods,
                 details: {
                     statusCode: 200,
                     method: request.method,

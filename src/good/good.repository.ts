@@ -83,7 +83,7 @@ class GoodRepository {
                 size,
                 (page - 1) * size
             ]
-        )
+        );
 
         return queryResult.rows.map((row) => GoodMapper.toDomain(row));
     }
