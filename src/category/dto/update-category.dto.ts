@@ -1,6 +1,6 @@
 import { CreateCategoryDto } from "./create-category.dto";
 
-interface UpdateCategoryDto extends CreateCategoryDto {};
+class UpdateCategoryDto extends CreateCategoryDto {};
 
 export {
     UpdateCategoryDto

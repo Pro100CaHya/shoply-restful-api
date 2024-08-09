@@ -60,7 +60,7 @@ describe("Integration Test Category Controller", () => {
     });
 
     it("Should create category 'Mobile phones', return created category and status '201'", async () => {
-        const createCategoryDto: CreateCategoryDto = {
+        const createCategoryDto = {
             name: "Mobile phones"
         };
 
@@ -80,7 +80,7 @@ describe("Integration Test Category Controller", () => {
     });
 
     it("Should create category 'Tablets', return created category and status '201'", async () => {
-        const createCategoryDto: CreateCategoryDto = {
+        const createCategoryDto = {
             name: "Tablets"
         };
 
@@ -100,7 +100,7 @@ describe("Integration Test Category Controller", () => {
     });
 
     it("Should create category 'Smartwatches', return created category and status '201'", async () => {
-        const createCategoryDto: CreateCategoryDto = {
+        const createCategoryDto = {
             name: "Smartwatches"
         };
 
@@ -120,7 +120,7 @@ describe("Integration Test Category Controller", () => {
     });
 
     it("Should create category 'TV', return created category and status '201'", async () => {
-        const createCategoryDto: CreateCategoryDto = {
+        const createCategoryDto = {
             name: "TV"
         };
 
@@ -140,7 +140,7 @@ describe("Integration Test Category Controller", () => {
     });
 
     it("Should create category 'Accessories', return created category and status '201'", async () => {
-        const createCategoryDto: CreateCategoryDto = {
+        const createCategoryDto = {
             name: "Accessories"
         };
 
@@ -160,7 +160,7 @@ describe("Integration Test Category Controller", () => {
     });
 
     it("Should create category 'Monitors', return created category and status '201'", async () => {
-        const createCategoryDto: CreateCategoryDto = {
+        const createCategoryDto = {
             name: "Monitors"
         };
 
@@ -177,6 +177,21 @@ describe("Integration Test Category Controller", () => {
                 name: "Monitors"
             }
         ]);
+    });
+
+    it("Should not create category 'A' because of 'Validation Error'", async () => {
+        const createCategoryDto = {
+            name: "A"
+        };
+
+        const createCategoryResponse = await request(server.getAppInstance())
+            .post("/api/categories")
+            .send(createCategoryDto);
+
+        const createCategoryResponseBody: HttpBodyResponse = createCategoryResponse.body;
+
+        expect(createCategoryResponse.status).toBe(400);
+        expect(createCategoryResponseBody.meta.message).toEqual("name must be longer than or equal to 2 characters");
     });
 
     it("Should get category 'Tablets', return found category and status '200'", async () => {
@@ -277,9 +292,22 @@ describe("Integration Test Category Controller", () => {
         ]);
     });
 
+    it("Should not found the unexisted category", async () => {
+        const categoryId = 20;
+
+        const updateCategoryResponse = await request(server.getAppInstance())
+            .get(`/api/categories/${categoryId}`)
+            .send();
+
+        const updateCategoryResponseBody: HttpBodyResponse = updateCategoryResponse.body;
+
+        expect(updateCategoryResponse.status).toBe(404);
+        expect(updateCategoryResponseBody.meta.message).toEqual(`Category with id ${categoryId} not found`);
+    });
+
     it("Should update the second category 'Tablets' and rename it to 'Laptops'", async () => {
         const categoryId = 2;
-        const updateCategoryDto: UpdateCategoryDto = {
+        const updateCategoryDto = {
             name: "Laptops"
         }
 
@@ -316,6 +344,22 @@ describe("Integration Test Category Controller", () => {
         ]);
     });
 
+    it("Should update the the unexisted category and get 'Not Found'", async () => {
+        const categoryId = 20;
+        const updateCategoryDto = {
+            name: "Laptops"
+        }
+
+        const updateCategoryResponse = await request(server.getAppInstance())
+            .patch(`/api/categories/${categoryId}`)
+            .send(updateCategoryDto);
+
+        const updateCategoryResponseBody: HttpBodyResponse = updateCategoryResponse.body;
+
+        expect(updateCategoryResponse.status).toBe(404);
+        expect(updateCategoryResponseBody.meta.message).toEqual(`Category with id ${categoryId} not found`);
+    });
+
     it("Should delete category 'Laptops'", async () => {
         const categoryId = 2;
 
@@ -342,5 +386,26 @@ describe("Integration Test Category Controller", () => {
         );
 
         expect(selectCategoryLaptopsQueryResult.rowCount).toBe(0);
+    });
+
+    it("Should delete unexisted category and get 'Not Found'", async () => {
+        const categoryId = 20;
+
+        const getCategoryResponse = await request(server.getAppInstance())
+            .delete(`/api/categories/${categoryId}`)
+            .send();
+
+        const getCategoryResponseBody: HttpBodyResponse = getCategoryResponse.body;
+
+        expect(getCategoryResponse.status).toBe(404);
+        expect(getCategoryResponseBody.meta.message).toEqual(`Category with id ${categoryId} not found`);
+
+        const selectCategoryLaptopsQueryResult: QueryResult = await postgresService.query(
+            `
+                SELECT id, name
+                FROM categories
+                WHERE id = 2;
+            `
+        );
     });
 });

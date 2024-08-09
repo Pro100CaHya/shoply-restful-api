@@ -8,7 +8,8 @@
     "build": "npx tsc -p tsconfig.build.json && tsc-alias",
     "prisma:dev": "npx prisma migrate dev",
     "jest:unit": "npx jest --testPathPattern=tests/unit",
-    "jest:integration": "npx jest --runInBand --forceExit --testPathPattern=tests/integration"
+    "jest:integration": "npx jest --runInBand --forceExit --testPathPattern=tests/integration",
+    "jest:coverage": "npx jest --coverage --runInBand --forceExit --coverageDirectory='coverage'"
   },
   "keywords": [],
   "author": "",
@@ -30,6 +31,8 @@
   "dependencies": {
     "@prisma/client": "^5.17.0",
     "body-parser": "^1.20.2",
+    "class-transformer": "^0.5.1",
+    "class-validator": "^0.14.1",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
     "pg": "^8.12.0"

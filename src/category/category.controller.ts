@@ -2,6 +2,7 @@ import { NextFunction, Request, Response, Router } from "express";
 import { CategoryService } from "./category.service";
 import { CreateCategoryDto, UpdateCategoryDto } from "./dto";
 import { HttpBodyResponse, HttpBodyResponseMetaStatus } from "src/interfaces";
+import { validationMiddleware } from "src/middlewares";
 
 class CategoryController {
     public router = Router();
@@ -14,8 +15,8 @@ class CategoryController {
     private initializeRoutes() {
         this.router.get(`${this.path}/:id`, this.getCategory);
         this.router.get(`${this.path}`, this.getAllCategories);
-        this.router.post(`${this.path}`, this.createCategory);
-        this.router.patch(`${this.path}/:id`, this.updateCategory);
+        this.router.post(`${this.path}`, validationMiddleware(CreateCategoryDto), this.createCategory);
+        this.router.patch(`${this.path}/:id`, validationMiddleware(CreateCategoryDto), this.updateCategory);
         this.router.delete(`${this.path}/:id`, this.deleteCategory);
     }
 
@@ -108,9 +109,7 @@ class CategoryController {
     private updateCategory = async (request: Request, response: Response, next: NextFunction) => {
         try {
             const { id } = request.params;
-            const updateCategoryDto: UpdateCategoryDto = {
-                name: request.body.name
-            }
+            const updateCategoryDto: UpdateCategoryDto = request.body;
 
             const category = await this.categoryService.updateCategory(updateCategoryDto, parseInt(id));
 
