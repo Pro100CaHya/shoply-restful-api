@@ -4,7 +4,7 @@ import { CategoryController, CategoryRepository, CategoryService } from "src/cat
 import { GoodController, GoodRepository, GoodService } from "src/good";
 import { Server } from "src/server";
 import { PostgresService } from "src/postgres";
-import { CreateGoodDto } from "src/good/dto";
+import { CreateGoodDto, UpdateGoodDto } from "src/good/dto";
 import { HttpBodyResponse } from "src/interfaces";
 import { Good } from "src/good/good.interface";
 
@@ -57,6 +57,67 @@ describe("Integration Test Good Controller", () => {
 
         expect(getGoodsResponse.status).toBe(200);
         expect(getGoodsResponseBody.data).toEqual(expectedGoods);
+    }
+
+    const getGoodByIdTest = async (goodId: number, expectedGood: Good, status = 200) => {
+        const getGoodByIdResponse = await request(server.getAppInstance())
+            .get(`/api/goods/${goodId}`)
+            .send();
+
+        const getGoodByIdResponseBody: HttpBodyResponse = getGoodByIdResponse.body;
+
+        expect(getGoodByIdResponse.status).toBe(status);
+
+        if (expectedGood === null) {
+            expect(getGoodByIdResponseBody.data).toEqual(null);
+        } else {
+            expect(getGoodByIdResponseBody.data).toEqual([expectedGood]);
+        }
+    }
+
+    const updateGoodTest = async (goodId: number, updateGoodDto: UpdateGoodDto, expectedGood: Good, status = 200) => {
+        const updateGoodResponse = await request(server.getAppInstance())
+            .patch(`/api/goods/${goodId}`)
+            .send(updateGoodDto);
+
+        const updateGoodResponseBody: HttpBodyResponse = updateGoodResponse.body;
+
+        expect(updateGoodResponse.status).toBe(status);
+
+        if (expectedGood === null) {
+            expect(updateGoodResponseBody.data).toEqual(null);
+        } else {
+            expect(updateGoodResponseBody.data).toEqual([expectedGood]);
+        }
+    }
+
+    const deleteGoodTest = async (goodId: number, expectedGood: Good, status = 200) => {
+        const deleteGoodResponse = await request(server.getAppInstance())
+            .delete(`/api/goods/${goodId}`)
+            .send();
+
+        const deleteGoodResponseBody: HttpBodyResponse = deleteGoodResponse.body;
+
+        expect(deleteGoodResponse.status).toBe(status);
+
+        if (expectedGood === null) {
+            expect(deleteGoodResponseBody.data).toEqual(null);
+        } else {
+            expect(deleteGoodResponseBody.data).toEqual([expectedGood]);
+
+            const findDeletedGood = await postgresService.query(
+                `
+                    SELECT id
+                    FROM goods
+                    WHERE id = $1
+                `,
+                [
+                    goodId
+                ]
+            );
+    
+            expect(findDeletedGood.rowCount).toBe(0);
+        }
     }
 
     beforeAll(async () => {
@@ -119,15 +180,15 @@ describe("Integration Test Good Controller", () => {
         };
 
         const expectedCreatedGoodResult =
-            {
+        {
+            id: 1,
+            name: "iPhone 13",
+            price: 899,
+            category: {
                 id: 1,
-                name: "iPhone 13",
-                price: 899,
-                category: {
-                    id: 1,
-                    name: "Mobile phones"
-                }
+                name: "Mobile phones"
             }
+        }
 
         await createTest(createGoodDto, expectedCreatedGoodResult);
     });
@@ -140,15 +201,15 @@ describe("Integration Test Good Controller", () => {
         };
 
         const expectedCreatedGoodResult =
-            {
-                id: 2,
-                name: "iPhone 13 Pro",
-                price: 999,
-                category: {
-                    id: 1,
-                    name: "Mobile phones"
-                }
+        {
+            id: 2,
+            name: "iPhone 13 Pro",
+            price: 999,
+            category: {
+                id: 1,
+                name: "Mobile phones"
             }
+        }
 
         await createTest(createGoodDto, expectedCreatedGoodResult);
     });
@@ -161,15 +222,15 @@ describe("Integration Test Good Controller", () => {
         };
 
         const expectedCreatedGoodResult =
-            {
-                id: 3,
-                name: "iPhone 13 Pro Max",
-                price: 1099,
-                category: {
-                    id: 1,
-                    name: "Mobile phones"
-                }
+        {
+            id: 3,
+            name: "iPhone 13 Pro Max",
+            price: 1099,
+            category: {
+                id: 1,
+                name: "Mobile phones"
             }
+        }
 
         await createTest(createGoodDto, expectedCreatedGoodResult);
     });
@@ -182,15 +243,15 @@ describe("Integration Test Good Controller", () => {
         };
 
         const expectedCreatedGoodResult =
-            {
-                id: 4,
-                name: "iPad Pro 11.9",
-                price: 1199,
-                category: {
-                    id: 2,
-                    name: "Tablets"
-                }
+        {
+            id: 4,
+            name: "iPad Pro 11.9",
+            price: 1199,
+            category: {
+                id: 2,
+                name: "Tablets"
             }
+        }
 
         await createTest(createGoodDto, expectedCreatedGoodResult);
     });
@@ -203,15 +264,15 @@ describe("Integration Test Good Controller", () => {
         };
 
         const expectedCreatedGoodResult =
-            {
-                id: 5,
-                name: "iPad Pro 12.9",
-                price: 1299,
-                category: {
-                    id: 2,
-                    name: "Tablets"
-                }
+        {
+            id: 5,
+            name: "iPad Pro 12.9",
+            price: 1299,
+            category: {
+                id: 2,
+                name: "Tablets"
             }
+        }
 
         await createTest(createGoodDto, expectedCreatedGoodResult);
     });
@@ -224,15 +285,15 @@ describe("Integration Test Good Controller", () => {
         };
 
         const expectedCreatedGoodResult =
-            {
-                id: 6,
-                name: "Apple Watch Ultra",
-                price: 799,
-                category: {
-                    id: 3,
-                    name: "Smartwatches"
-                }
+        {
+            id: 6,
+            name: "Apple Watch Ultra",
+            price: 799,
+            category: {
+                id: 3,
+                name: "Smartwatches"
             }
+        }
 
         await createTest(createGoodDto, expectedCreatedGoodResult);
     });
@@ -245,15 +306,15 @@ describe("Integration Test Good Controller", () => {
         };
 
         const expectedCreatedGoodResult =
-            {
-                id: 7,
-                name: "Apple Watch Ultra 2",
-                price: 899,
-                category: {
-                    id: 3,
-                    name: "Smartwatches"
-                }
+        {
+            id: 7,
+            name: "Apple Watch Ultra 2",
+            price: 899,
+            category: {
+                id: 3,
+                name: "Smartwatches"
             }
+        }
 
         await createTest(createGoodDto, expectedCreatedGoodResult);
     });
@@ -266,15 +327,15 @@ describe("Integration Test Good Controller", () => {
         };
 
         const expectedCreatedGoodResult =
-            {
-                id: 8,
-                name: "Apple Watch Series 7",
-                price: 649,
-                category: {
-                    id: 3,
-                    name: "Smartwatches"
-                }
+        {
+            id: 8,
+            name: "Apple Watch Series 7",
+            price: 649,
+            category: {
+                id: 3,
+                name: "Smartwatches"
             }
+        }
 
         await createTest(createGoodDto, expectedCreatedGoodResult);
     });
@@ -323,5 +384,83 @@ describe("Integration Test Good Controller", () => {
         ]
 
         await getGoodsTest(page, size, expectedGetGoodsResult);
+    });
+
+    it(`Get good 'Apple Watch Ultra 2'`, async () => {
+        const goodId = 7;
+        const expectedGetGoodByIdResult =
+        {
+            id: 7,
+            name: "Apple Watch Ultra 2",
+            price: 899,
+            category: {
+                id: 3,
+                name: "Smartwatches"
+            }
+        };
+
+        await getGoodByIdTest(goodId, expectedGetGoodByIdResult);
+    });
+
+    it(`Get unexisted good and get Not Found`, async () => {
+        const goodId = 9;
+
+        await getGoodByIdTest(goodId, null, 404);
+    });
+
+    it(`Should update good 'Apple Watch Ultra 2' to 'Apple Watch Ultra 3'`, async () => {
+        const goodId = 7;
+        const updateGoodDto: UpdateGoodDto = {
+            name: "Apple Watch Ultra 3",
+            price: 2000
+        };
+
+        const expectedUpdateGoodResult =
+        {
+            id: 7,
+            name: "Apple Watch Ultra 3",
+            price: 2000,
+            category: {
+                id: 3,
+                name: "Smartwatches"
+            }
+        };
+
+        await updateGoodTest(goodId, updateGoodDto,  expectedUpdateGoodResult);
+    });
+
+    it(`Should update unexisted good`, async () => {
+        const goodId = 10;
+        const updateGoodDto: UpdateGoodDto = {
+            name: "Apple Watch Ultra 3",
+            price: 2000
+        };
+
+        await updateGoodTest(goodId, updateGoodDto, null, 404);
+    });
+
+    it(`Should delete good 'Apple Watch Ultra 2' to 'Apple Watch Ultra 3'`, async () => {
+        const goodId = 7;
+
+        const expectedDeleteGoodResult =
+        {
+            id: 7,
+            name: "Apple Watch Ultra 3",
+            price: 2000,
+            category: {
+                id: 3,
+                name: "Smartwatches"
+            }
+        };
+
+        await deleteGoodTest(goodId,  expectedDeleteGoodResult);
+    });
+
+    it(`Should delete unexisted good`, async () => {
+        const goodId = 17;
+
+        const expectedDeleteGoodResult: null = null;
+
+        await deleteGoodTest(goodId,  expectedDeleteGoodResult, 404);
     });
 });

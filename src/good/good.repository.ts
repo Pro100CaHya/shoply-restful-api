@@ -4,7 +4,7 @@ import { GoodMapper } from "./good.mapper";
 import { Good } from "./good.interface";
 
 class GoodRepository {
-    constructor(private postgresService: PostgresService) {}
+    constructor(private postgresService: PostgresService) { }
 
     public async createGood(createGoodDto: CreateGoodDto): Promise<Good> {
         const {
@@ -53,12 +53,16 @@ class GoodRepository {
                 JOIN
                     categories c ON g.category_id = c.id
                 WHERE
-                    c.id = $1;
+                    g.id = $1;
             `,
             [
                 id
             ]
         );
+
+        if (queryResult.rows.length === 0) {
+            return null;
+        }
 
         return GoodMapper.toDomain(queryResult.rows[0]);
     }
@@ -117,6 +121,32 @@ class GoodRepository {
             `,
             [
                 ...values,
+                id
+            ]
+        )
+
+        return GoodMapper.toDomain(queryResult.rows[0]);
+    }
+
+    public async deleteGood(id: number): Promise<Good> {
+        const queryResult = await this.postgresService.query(
+            `
+                WITH deleted_good AS (
+                    DELETE FROM goods
+                    WHERE id = $1
+                    RETURNING id, name, price, category_id
+                )
+                SELECT
+                    g.id AS id,
+                    g.name AS name,
+                    g.price AS price,
+                    json_build_object('id', c.id, 'name', c.name) AS category
+                FROM
+                    deleted_good g
+                JOIN
+                    categories c ON g.category_id = c.id;
+            `,
+            [
                 id
             ]
         )
