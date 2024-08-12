@@ -40,6 +40,14 @@ class UserService {
             throw new UserNotFoundException(id);
         }
 
+        if (updateUserDto?.email) {
+            const userWithTheSameEmail = await this.userRepository.getUserByEmail(updateUserDto?.email);
+
+            if (userWithTheSameEmail) {
+                throw new UserWithEmailAlreadyExists(userWithTheSameEmail.email)
+            }
+        }
+
         return await this.userRepository.updateUser(id, updateUserDto);
     }
 

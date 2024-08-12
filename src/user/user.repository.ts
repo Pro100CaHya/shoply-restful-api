@@ -34,6 +34,7 @@ class UserRepository {
             `
                 SELECT id, email, password, role
                 FROM users
+                ORDER BY id
                 LIMIT $1
                 OFFSET $2;
             `,
@@ -42,10 +43,6 @@ class UserRepository {
                 (page - 1) * size
             ]
         );
-
-        if (queryResult.rowCount === 0) {
-            return null;
-        }
 
         return queryResult.rows.map((row) => UserMapper.toDomain(row));
     }
@@ -102,10 +99,11 @@ class UserRepository {
                 UPDATE users
                 SET ${setClauses.join(", ")}
                 WHERE id = $${values.length + 1}
-                RETURNING id, email, password, role
+                RETURNING id, email, password, role;
             `,
             [
-                ...values
+                ...values,
+                id
             ]
         );
 
