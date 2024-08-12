@@ -7,6 +7,8 @@ import { config } from "dotenv";
 import { UserController, UserRepository, UserService } from "./user";
 import { CategoryController, CategoryRepository, CategoryService } from "./category";
 import { GoodController, GoodRepository, GoodService } from "./good";
+import { AuthService } from "./auth/auth.service";
+import { AuthController } from "./auth/auth.controller";
 
 config();
 
@@ -39,12 +41,16 @@ const goodRepository = new GoodRepository(postgresService);
 const goodService = new GoodService(goodRepository, categoryService);
 const goodController = new GoodController(goodService);
 
+const authService = new AuthService(userService);
+const authController = new AuthController(authService);
+
 const server = new Server(
     parseInt(SERVER_PORT),
     [
         categoryController,
         goodController,
         userController,
+        authController
     ]
 );
 

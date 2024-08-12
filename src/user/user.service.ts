@@ -1,7 +1,7 @@
 import { hashSync } from "bcrypt";
 
 import { CreateUserDto, UpdateUserDto } from "./dto";
-import { UserNotFoundException, UserWithEmailAlreadyExists } from "./exceptions";
+import { UserWithIdNotFoundException, UserWithEmailNotFoundException, UserWithEmailAlreadyExists } from "./exceptions";
 import { UserRepository } from "./user.repository";
 
 class UserService {
@@ -23,10 +23,14 @@ class UserService {
         const user = await this.userRepository.getUserById(id);
 
         if (!user) {
-            throw new UserNotFoundException(id);
+            throw new UserWithIdNotFoundException(id);
         }
 
-        return await this.userRepository.getUserById(id);
+        return user;
+    }
+
+    public async getUserByEmail(email: string) {
+        return await this.userRepository.getUserByEmail(email);
     }
 
     public async getAllUsers(page: number, size: number) {
@@ -37,7 +41,7 @@ class UserService {
         const user = await this.userRepository.getUserById(id);
 
         if (!user) {
-            throw new UserNotFoundException(id);
+            throw new UserWithIdNotFoundException(id);
         }
 
         if (updateUserDto?.email) {
@@ -55,7 +59,7 @@ class UserService {
         const user = await this.userRepository.getUserById(id);
 
         if (!user) {
-            throw new UserNotFoundException(id);
+            throw new UserWithIdNotFoundException(id);
         }
 
         return await this.userRepository.deleteUser(id);
