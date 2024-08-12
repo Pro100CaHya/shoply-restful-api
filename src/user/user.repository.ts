@@ -1,5 +1,5 @@
 import { PostgresService } from "src/postgres"
-import { CreateUserDto } from "./dto"
+import { CreateUserDto, UpdateUserDto } from "./dto"
 import { UserMapper } from "./user.mapper";
 import { User } from "./user.interface";
 
@@ -29,6 +29,27 @@ class UserRepository {
         return UserMapper.toDomain(queryResult.rows[0]);
     }
 
+    public async getAllUsers(page: number, size: number): Promise<User[]> {
+        const queryResult = await this.postgresService.query(
+            `
+                SELECT id, email, password, role
+                FROM users
+                LIMIT $1
+                OFFSET $2;
+            `,
+            [
+                size,
+                (page - 1) * size
+            ]
+        );
+
+        if (queryResult.rowCount === 0) {
+            return null;
+        }
+
+        return queryResult.rows.map((row) => UserMapper.toDomain(row));
+    }
+
     public async getUserById(id: number): Promise<User> {
         const queryResult = await this.postgresService.query(
             `
@@ -44,6 +65,64 @@ class UserRepository {
         if (queryResult.rowCount === 0) {
             return null;
         }
+
+        return UserMapper.toDomain(queryResult.rows[0]);
+    }
+
+    public async getUserByEmail(email: string) {
+        const queryResult = await this.postgresService.query(
+            `
+                SELECT id, email, password, role
+                FROM users
+                WHERE email = $1;
+            `,
+            [
+                email
+            ]
+        );
+
+        if (queryResult.rowCount === 0) {
+            return null;
+        }
+
+        return UserMapper.toDomain(queryResult.rows[0]);
+    }
+
+    public async updateUser(id: number, updateUserDto: UpdateUserDto): Promise<User> {
+        const setClauses: Array<string> = [];
+        const values: Array<string | number> = [];
+
+        Object.entries(updateUserDto).forEach(([key, value], index) => {
+            setClauses.push(`${key} = $${index + 1}`);
+            values.push(value);
+        });
+
+        const queryResult = await this.postgresService.query(
+            `
+                UPDATE users
+                SET ${setClauses.join(", ")}
+                WHERE id = $${values.length + 1}
+                RETURNING id, email, password, role
+            `,
+            [
+                ...values
+            ]
+        );
+
+        return UserMapper.toDomain(queryResult.rows[0]);
+    }
+
+    public async deleteUser(id: number): Promise<User> {
+        const queryResult = await this.postgresService.query(
+            `
+                DELETE FROM users
+                WHERE id = $1
+                RETURNING id, email, password, role;
+            `,
+            [
+                id
+            ]
+        );
 
         return UserMapper.toDomain(queryResult.rows[0]);
     }
