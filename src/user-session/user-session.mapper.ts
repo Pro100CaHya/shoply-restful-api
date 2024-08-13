@@ -4,9 +4,9 @@ class UserSessionMapper {
     static toDomain(raw: any): UserSession {
         return {
             id: raw.id,
-            device: raw.string,
-            refreshToken: raw.string,
-            userId: raw.userId
+            device: raw.device,
+            refreshToken: raw.refresh_token,
+            userId: raw.user_id
         }
     }
 }

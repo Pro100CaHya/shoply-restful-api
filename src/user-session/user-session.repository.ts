@@ -27,6 +27,27 @@ class UserSessionRepository {
         return UserSessionMapper.toDomain(queryResult.rows[0]);
     }
 
+    public async getUserSessionByRefreshToken(refreshToken: string): Promise<UserSession> {
+        const queryResult = await this.postgresService.query(
+            `
+                SELECT id, device, refresh_token, user_id
+                FROM user_sessions
+                WHERE refresh_token = $1;
+            `,
+            [
+                refreshToken
+            ]
+        );
+
+        if (queryResult.rowCount === 0) {
+            return null;
+        }
+
+        console.log(queryResult.rows[0])
+
+        return UserSessionMapper.toDomain(queryResult.rows[0]);
+    }
+
     public async getUserSessionByDeviceAndUserId(device: string, userId: number): Promise<UserSession> {
         const queryResult = await this.postgresService.query(
             `
@@ -47,7 +68,7 @@ class UserSessionRepository {
         return UserSessionMapper.toDomain(queryResult.rows[0]);
     }
 
-    public async deleteSession(id: number) {
+    public async deleteSessionById(id: number) {
         const queryResult = await this.postgresService.query(
             `
                 DELETE FROM user_sessions
