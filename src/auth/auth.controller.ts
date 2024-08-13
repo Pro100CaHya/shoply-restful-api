@@ -18,10 +18,10 @@ class AuthController implements Controller {
 
     private login = async (request: Request, response: Response, next: NextFunction) => {
         try {
-            const deviceId = request.headers["user-agent"];
+            const device = request.headers["user-agent"];
             const loginDto: LoginDto = request.body;
 
-            const authTokens = await this.authService.login(loginDto, deviceId);
+            const authTokens = await this.authService.login(loginDto, device);
 
             const httpBodyResponse: HttpBodyResponse = {
                 data: [
@@ -33,7 +33,7 @@ class AuthController implements Controller {
                     time: new Date().toISOString()
                 },
                 meta: {
-                    message: "Tokens received",
+                    message: "Authorized",
                     status: HttpBodyResponseMetaStatus.SUCCESS,
                 },
             }

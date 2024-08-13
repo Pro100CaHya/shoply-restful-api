@@ -9,6 +9,7 @@ import { CategoryController, CategoryRepository, CategoryService } from "./categ
 import { GoodController, GoodRepository, GoodService } from "./good";
 import { AuthService } from "./auth/auth.service";
 import { AuthController } from "./auth/auth.controller";
+import { UserSessionRepository } from "./user-session";
 
 config();
 
@@ -41,7 +42,9 @@ const goodRepository = new GoodRepository(postgresService);
 const goodService = new GoodService(goodRepository, categoryService);
 const goodController = new GoodController(goodService);
 
-const authService = new AuthService(userService);
+const userSessionRepository = new UserSessionRepository(postgresService);
+
+const authService = new AuthService(userService, userSessionRepository);
 const authController = new AuthController(authService);
 
 const server = new Server(
