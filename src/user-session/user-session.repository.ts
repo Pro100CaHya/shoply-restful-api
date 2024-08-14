@@ -42,9 +42,7 @@ class UserSessionRepository {
         if (queryResult.rowCount === 0) {
             return null;
         }
-
-        console.log(queryResult.rows[0])
-
+        
         return UserSessionMapper.toDomain(queryResult.rows[0]);
     }
 

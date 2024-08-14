@@ -81,7 +81,7 @@ class AuthService {
                 id: registeredUser.id,
                 role: registeredUser.role
             }
-        }, "10m");
+        });
 
         const refreshToken = this.generateRefreshToken({
             device,
@@ -89,7 +89,7 @@ class AuthService {
                 id: registeredUser.id,
                 role: registeredUser.role
             }
-        }, "5s");
+        });
 
         const createUserSessionDto: CreateUserSessionDto = {
             device,
@@ -139,8 +139,6 @@ class AuthService {
                 }
             });
 
-            console.log("refresh:", newRefreshToken)
-
             const createUserSessionDto: CreateUserSessionDto = {
                 device,
                 userId,
@@ -182,6 +180,9 @@ class AuthService {
             ),
             expiresIn
         }
+    }
+
+    private logout() {
     }
 }
 
